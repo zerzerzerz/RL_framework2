@@ -25,8 +25,8 @@ def get_args():
     parser.add_argument('--coef_loss_action', type=float, default=1.0)
     parser.add_argument('--coef_loss_entropy', type=float, default=0.01)
     parser.add_argument('--clip_param', type=float, default=0.2)
-    parser.add_argument('--log_interval', type=int, default=1000)
-    parser.add_argument('--plot_interval', type=int, default=1000)
+    parser.add_argument('--log_interval', type=int, default=300)
+    parser.add_argument('--plot_interval', type=int, default=300)
     parser.add_argument('--compute_advantage_method', type=str, default='normal')
     
     args = parser.parse_args()

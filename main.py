@@ -47,13 +47,13 @@ def main(args):
 
     for epoch in tqdm(range(args.total_steps // args.buffer_capacity)):
         agent.collect_episode()
-        log_dict = agent.update()
-        episode_reward, num_steps = agent.evaluate()
+        log_dict_train = agent.update()
+        log_dict_test = agent.evaluate()
 
-        df_train = log.save_log(df_train, join(args.log_dir, 'train.csv'), epoch, args.log_interval, **log_dict)
-        df_test = log.save_log(df_test, join(args.log_dir, 'test.csv'), epoch, args.log_interval, episode_reward=episode_reward, num_steps=num_steps)
-        plot.draw_and_save(df_train, epoch, args.plot_interval, args.fig_dir, *log_dict.keys())
-        plot.draw_and_save(df_test, epoch, args.plot_interval, args.fig_dir, 'episode_reward', 'num_steps')
+        df_train = log.save_log(df_train, join(args.log_dir, 'train.csv'), epoch, args.log_interval, **log_dict_train)
+        df_test = log.save_log(df_test, join(args.log_dir, 'test.csv'), epoch, args.log_interval, **log_dict_test)
+        plot.draw_and_save(df_train, epoch, args.plot_interval, args.fig_dir, *log_dict_train.keys())
+        plot.draw_and_save(df_test, epoch, args.plot_interval, args.fig_dir, *log_dict_test.keys())
 
 
 

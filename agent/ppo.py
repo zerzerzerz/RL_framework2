@@ -58,6 +58,8 @@ class PPO(torch.nn.Module):
         epoch_loss_entropy = 0
         epoch_advantage = 0
         epoch_ratio = 0
+        epoch_return = 0
+        epoch_value = 0
         self.train()
         for epoch in range(self.update_epoch):
             dataloader = self.buffer.get_generator()
@@ -91,6 +93,8 @@ class PPO(torch.nn.Module):
                 epoch_loss_entropy += loss_entropy.item()
                 epoch_advantage += advantage.mean().item()
                 epoch_ratio += ratio.mean().item()
+                epoch_return += return_.mean().item()
+                epoch_value += new_value.mean().item()
                 
         self.lr_scheduler.step()
         self.actor_critic_old.load_state_dict(self.actor_critic.state_dict())
@@ -100,6 +104,8 @@ class PPO(torch.nn.Module):
             "loss_entropy": epoch_loss_entropy,
             "advantage": epoch_advantage, 
             "ratio": epoch_ratio,
+            "epoch_return": epoch_return,
+            "epoch_value": epoch_value,
         }
         for k in res.keys():
             res[k] /= self.update_epoch
@@ -112,14 +118,17 @@ class PPO(torch.nn.Module):
             self.eval()
             obs = self.env.reset()
             done = False
-            i = 0
-            rewards = 0
-            while not done and i < self.max_episode_len:
+            num_steps = 0
+            episode_reward = 0
+            while not done and num_steps < self.max_episode_len:
                 value, action, action_prob = self.actor_critic.act(obs)
                 obs, reward, done, info = self.env.step(action)
-                rewards += reward.item()
-                i += 1
-            return rewards, i
+                episode_reward += reward.item()
+                num_steps += 1
+            return {
+                "episode_reward": episode_reward,
+                "num_steps": num_steps
+            }
                 
                 
                 
